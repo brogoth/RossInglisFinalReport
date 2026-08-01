@@ -1,0 +1,7 @@
+{
+  "train_accuracy": 0.876,
+  "test_accuracy": 0.81,
+  "disparate_impact_ratio": 1.024,
+  "n_train": 1600,
+  "n_test": 400
+}

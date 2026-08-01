@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advisor — Sustainability Prototype</title>
+<style>
+  :root{
+    --ink:#1c2b22;
+    --paper:#f6f4ee;
+    --moss:#3c5c46;
+    --moss-light:#6b8f76;
+    --clay:#b5652b;
+    --line:#d9d4c4;
+    --white:#fffdf8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family: "Iowan Old Style","Georgia",serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:48px 24px 80px;}
+  header{border-bottom:2px solid var(--ink);padding-bottom:20px;margin-bottom:36px;}
+  .eyebrow{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--moss-light);margin-bottom:6px;
+  }
+  h1{margin:0 0 4px;font-size:32px;font-weight:600;letter-spacing:-0.01em;}
+  .sub{font-family:"Helvetica Neue",Arial,sans-serif;font-size:14px;color:#5c6b60;}
+
+  .card{
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:28px;
+    margin-bottom:20px;
+  }
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:560px){.grid{grid-template-columns:1fr;}}
+  label{
+    display:block;font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:12px;letter-spacing:.03em;color:#5c6b60;margin-bottom:6px;
+  }
+  input[type=number], select{
+    width:100%;padding:10px 12px;font-size:16px;
+    border:1px solid var(--line);border-radius:2px;background:var(--paper);
+    font-family:"Helvetica Neue",Arial,sans-serif;color:var(--ink);
+  }
+  input[type=range]{width:100%;accent-color:var(--moss);}
+  .field{margin-bottom:16px;}
+  .toggle-row{display:flex;gap:24px;align-items:center;margin-top:6px;font-family:"Helvetica Neue",Arial,sans-serif;font-size:14px;}
+  .toggle-row label{display:flex;align-items:center;gap:6px;margin:0;color:var(--ink);font-size:14px;}
+
+  button{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    background:var(--moss);color:var(--white);border:none;
+    padding:14px 28px;font-size:14px;letter-spacing:.03em;
+    border-radius:2px;cursor:pointer;width:100%;margin-top:8px;
+  }
+  button:hover{background:#2e4a37;}
+  button:disabled{background:#a9b6ac;cursor:default;}
+
+  .result{display:none;}
+  .footprint-figure{
+    text-align:center;padding:20px 0 24px;border-bottom:1px solid var(--line);margin-bottom:24px;
+  }
+  .footprint-number{font-size:56px;font-weight:600;color:var(--moss);line-height:1;}
+  .footprint-unit{font-family:"Helvetica Neue",Arial,sans-serif;font-size:13px;color:#5c6b60;margin-top:6px;}
+
+  .rec{
+    display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);
+  }
+  .rec:last-child{border-bottom:none;}
+  .rec-index{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:12px;color:var(--clay);
+    min-width:20px;padding-top:3px;font-weight:600;
+  }
+  .rec-body .rec-cat{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:10px;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--moss-light);margin-bottom:3px;
+  }
+  .rec-text{font-size:17px;margin-bottom:6px;}
+  .rec-why{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:12.5px;color:#5c6b60;
+    background:var(--paper);padding:8px 10px;border-radius:2px;border-left:2px solid var(--clay);
+  }
+
+  .meta-row{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:12px;color:#5c6b60;
+    display:flex;justify-content:space-between;margin-top:18px;
+  }
+  .error{color:#a13c2c;font-family:"Helvetica Neue",Arial,sans-serif;font-size:13px;display:none;margin-top:10px;}
+  .loading{
+    font-family:"Helvetica Neue",Arial,sans-serif;font-size:13px;color:var(--moss-light);
+    display:none;text-align:center;padding:20px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">AI-Powered Sustainability Advisor — Prototype</div>
+    <h1>Weekly footprint check-in</h1>
+    <div class="sub">Personalised, explainable recommendations from your recent behaviour</div>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div class="field">
+        <label for="car">Car travel this week (km)</label>
+        <input type="number" id="car" value="150" min="0" step="1">
+      </div>
+      <div class="field">
+        <label for="elec">Electricity use this week (kWh)</label>
+        <input type="number" id="elec" value="45" min="0" step="1">
+      </div>
+      <div class="field">
+        <label for="meat">Meat-based meals this week</label>
+        <input type="number" id="meat" value="8" min="0" step="1">
+      </div>
+      <div class="field">
+        <label for="household">Household size</label>
+        <input type="number" id="household" value="3" min="1" step="1">
+      </div>
+      <div class="field">
+        <label for="region">Region</label>
+        <select id="region">
+          <option value="uk">UK average grid</option>
+          <option value="scotland">Scotland (cleaner grid mix)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Area type</label>
+        <div class="toggle-row">
+          <label><input type="radio" name="rural" value="0" checked> Urban / suburban</label>
+          <label><input type="radio" name="rural" value="1"> Rural</label>
+        </div>
+      </div>
+    </div>
+    <button id="submit">Get my recommendations</button>
+    <button id="reset-demo" style="background:transparent;color:#5c6b60;border:1px solid #d9d4c4;margin-top:8px;">Reset demo data</button>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="loading" id="loading">Calculating footprint and running the model…</div>
+
+  <div class="card result" id="result">
+    <div class="footprint-figure">
+      <div class="footprint-number" id="footprint-value">—</div>
+      <div class="footprint-unit">kg CO₂e this week</div>
+    </div>
+    <div id="recs"></div>
+    <div class="meta-row">
+      <span id="likelihood"></span>
+      <span id="userid"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = "http://localhost:5001";
+
+document.getElementById("submit").addEventListener("click", async () => {
+  const btn = document.getElementById("submit");
+  const errorEl = document.getElementById("error");
+  const loadingEl = document.getElementById("loading");
+  const resultEl = document.getElementById("result");
+  errorEl.style.display = "none";
+  resultEl.style.display = "none";
+  loadingEl.style.display = "block";
+  btn.disabled = true;
+
+  const payload = {
+    weekly_car_km: parseFloat(document.getElementById("car").value) || 0,
+    weekly_electricity_kwh: parseFloat(document.getElementById("elec").value) || 0,
+    weekly_meat_meals: parseFloat(document.getElementById("meat").value) || 0,
+    household_size: parseInt(document.getElementById("household").value) || 1,
+    region: document.getElementById("region").value,
+    is_rural: parseInt(document.querySelector('input[name="rural"]:checked').value)
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/api/advice`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      let message = `Server responded ${res.status}`;
+      try {
+        const errBody = await res.json();
+        if (errBody && errBody.error) message = errBody.error;
+      } catch (parseErr) { /* fall back to the generic message above */ }
+      throw new Error(message);
+    }
+    const data = await res.json();
+
+    document.getElementById("footprint-value").textContent = data.weekly_footprint_kgco2e;
+    document.getElementById("likelihood").textContent =
+      `Predicted acceptance likelihood: ${(data.acceptance_likelihood * 100).toFixed(0)}%`;
+    document.getElementById("userid").textContent = `User: ${data.user_id.slice(0,8)}…`;
+
+    const recsEl = document.getElementById("recs");
+    recsEl.innerHTML = "";
+    data.recommendations.forEach((rec, i) => {
+      const div = document.createElement("div");
+      div.className = "rec";
+      div.innerHTML = `
+        <div class="rec-index">${String(i+1).padStart(2,"0")}</div>
+        <div class="rec-body">
+          <div class="rec-cat">${rec.category}</div>
+          <div class="rec-text">${rec.text}</div>
+          <div class="rec-why">${rec.explanation}</div>
+        </div>`;
+      recsEl.appendChild(div);
+    });
+    if (data.recommendations.length === 0) {
+      recsEl.innerHTML = `<div class="rec-why">No thresholds triggered this week — your logged behaviour is already within the lower-impact range for these categories.</div>`;
+    }
+
+    resultEl.style.display = "block";
+  } catch (err) {
+    if (err instanceof TypeError) {
+      // fetch() itself threw — this is a genuine connection failure (backend not running, wrong port, CORS, etc.)
+      errorEl.textContent = `Couldn't reach the advisor API: ${err.message}. Make sure the Flask backend is running on port 5001.`;
+    } else {
+      // The backend responded, but rejected the request — show its actual message.
+      errorEl.textContent = err.message;
+    }
+    errorEl.style.display = "block";
+  } finally {
+    loadingEl.style.display = "none";
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("reset-demo").addEventListener("click", async () => {
+  const btn = document.getElementById("reset-demo");
+  btn.disabled = true;
+  btn.textContent = "Resetting...";
+  try {
+    const res = await fetch(`${API_BASE}/api/reset`, { method: "POST" });
+    if (!res.ok) throw new Error(`Server responded ${res.status}`);
+    document.getElementById("result").style.display = "none";
+    document.getElementById("error").style.display = "none";
+    btn.textContent = "Demo data cleared";
+    setTimeout(() => { btn.textContent = "Reset demo data"; btn.disabled = false; }, 1500);
+  } catch (err) {
+    btn.textContent = "Reset failed — check backend";
+    setTimeout(() => { btn.textContent = "Reset demo data"; btn.disabled = false; }, 2000);
+  }
+});
+</script>
+</body>
+</html>
